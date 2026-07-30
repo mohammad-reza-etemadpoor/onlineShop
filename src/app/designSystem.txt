@@ -1,0 +1,462 @@
+For **Little Loom**, I'd position the brand as **modern, premium, warm, and trustworthy**—something that appeals to parents without feeling overly childish. The design should be clean and soft, letting the products stand out.
+
+---
+
+# Little Loom Design System
+
+## Brand Personality
+
+* 👶 Warm
+* 🧸 Playful (but not cartoonish)
+* 🌼 Gentle
+* ✨ Premium
+* 🤍 Minimal
+* 🧵 Crafted with love
+
+### Brand Keywords
+
+```
+Soft
+Comfort
+Natural
+Cozy
+Gentle
+Safe
+Premium
+Minimal
+Happy
+Family
+```
+
+---
+
+# Color Palette
+
+## Primary
+
+Your chosen brand color:
+
+**Sunshine Yellow**
+
+```
+#F9E34F
+```
+
+Use for:
+
+* Primary buttons
+* Logo
+* Highlights
+* Icons
+* Sale badges
+
+---
+
+## Secondary
+
+**Warm Cream**
+
+```
+#FFF9EB
+```
+
+Backgrounds.
+
+---
+
+## Accent
+
+**Soft Peach**
+
+```
+#FFD9C8
+```
+
+Use sparingly for promotions or decorative elements.
+
+---
+
+## Success
+
+```
+#5DBB63
+```
+
+---
+
+## Warning
+
+```
+#F4A261
+```
+
+---
+
+## Error
+
+```
+#E76F51
+```
+
+---
+
+## Neutral Colors
+
+| Name     | Color   |
+| -------- | ------- |
+| White    | #FFFFFF |
+| Gray 50  | #FAFAFA |
+| Gray 100 | #F4F4F5 |
+| Gray 200 | #E4E4E7 |
+| Gray 300 | #D4D4D8 |
+| Gray 400 | #A1A1AA |
+| Gray 500 | #71717A |
+| Gray 600 | #52525B |
+| Gray 700 | #3F3F46 |
+| Gray 800 | #27272A |
+| Gray 900 | #18181B |
+
+---
+
+# Typography
+
+## Heading Font
+
+**Poppins**
+
+Bold
+
+Weights
+
+* 600
+* 700
+
+---
+
+## Body Font
+
+**Inter**
+
+Weights
+
+* 400
+* 500
+* 600
+
+---
+
+## Font Scale
+
+| Element    | Size |
+| ---------- | ---- |
+| Hero       | 56px |
+| H1         | 48px |
+| H2         | 36px |
+| H3         | 30px |
+| H4         | 24px |
+| H5         | 20px |
+| H6         | 18px |
+| Body Large | 18px |
+| Body       | 16px |
+| Small      | 14px |
+| Caption    | 12px |
+
+---
+
+# Border Radius
+
+Small
+
+```
+8px
+```
+
+Medium
+
+```
+12px
+```
+
+Large
+
+```
+16px
+```
+
+Cards
+
+```
+20px
+```
+
+Buttons
+
+```
+9999px
+```
+
+Rounded pill buttons reinforce the friendly feel.
+
+---
+
+# Shadows
+
+### Small
+
+```
+0 2px 8px rgba(0,0,0,.06)
+```
+
+### Medium
+
+```
+0 8px 24px rgba(0,0,0,.08)
+```
+
+### Large
+
+```
+0 20px 50px rgba(0,0,0,.12)
+```
+
+---
+
+# Buttons
+
+## Primary
+
+* Yellow background
+* Black text
+* Pill shape
+
+Hover
+
+Slightly darker yellow.
+
+---
+
+## Secondary
+
+White background
+
+Gray border
+
+---
+
+## Outline
+
+Transparent
+
+Gray border
+
+---
+
+## Ghost
+
+Transparent
+
+No border
+
+---
+
+# Inputs
+
+Height
+
+```
+48px
+```
+
+Radius
+
+```
+14px
+```
+
+Border
+
+```
+1px solid #E4E4E7
+```
+
+Focus
+
+```
+2px #F9E34F
+```
+
+---
+
+# Cards
+
+* White background
+* 20px radius
+* Soft shadow
+* 24px padding
+
+---
+
+# Product Card
+
+Contains
+
+* Product image
+* Favorite button
+* Discount badge
+* Product name
+* Rating
+* Price
+* Add to cart button
+
+---
+
+# Spacing Scale
+
+```
+4
+8
+12
+16
+20
+24
+32
+40
+48
+64
+80
+96
+128
+```
+
+---
+
+# Icons
+
+Style
+
+* Rounded
+* Outline
+* 2px stroke
+
+Suggested icon sets:
+
+* Lucide
+* Heroicons
+
+---
+
+# Image Style
+
+* Bright lighting
+* White background
+* Soft shadows
+* Warm color grading
+* Real babies and children
+* Minimal props
+* High-resolution photography
+
+---
+
+# Illustration Style
+
+* Flat
+* Soft colors
+* Rounded shapes
+* Minimal detail
+* Friendly without being overly childish
+
+---
+
+# Motion
+
+Keep animations subtle:
+
+* 150–250ms duration
+* Fade-ins for content
+* Scale to 1.03 on card hover
+* Smooth button hover transitions
+* Slide-in mobile menu
+
+Avoid bouncy or distracting animations.
+
+---
+
+# Grid
+
+* Desktop: 12 columns
+* Tablet: 8 columns
+* Mobile: 4 columns
+
+Container widths:
+
+* **sm:** 640px
+* **md:** 768px
+* **lg:** 1024px
+* **xl:** 1280px
+* **2xl:** 1440px (recommended max container)
+
+---
+
+# Component Library
+
+Build these reusable components first:
+
+* Navbar
+* Search bar
+* Hero banner
+* Category card
+* Product card
+* Product carousel
+* Filter sidebar
+* Breadcrumbs
+* Pagination
+* Quantity selector
+* Wishlist button
+* Shopping cart drawer
+* Checkout form
+* Price summary
+* Testimonials
+* Newsletter section
+* Footer
+* Loading skeletons
+* Empty states
+* Toast notifications
+* Modal dialog
+
+---
+
+# Accessibility
+
+* Meet WCAG AA color contrast where applicable.
+* Minimum touch target size of **44×44px**.
+* Visible keyboard focus indicators.
+* Semantic HTML and proper ARIA labels.
+* Alt text for all product images.
+
+## Tailwind CSS Design Tokens
+
+```js
+colors: {
+  primary: "#F9E34F",
+  cream: "#FFF9EB",
+  peach: "#FFD9C8",
+  success: "#5DBB63",
+  warning: "#F4A261",
+  danger: "#E76F51",
+},
+
+borderRadius: {
+  sm: "8px",
+  md: "12px",
+  lg: "16px",
+  xl: "20px",
+  full: "9999px",
+},
+
+fontFamily: {
+  heading: ["Poppins", "sans-serif"],
+  body: ["Inter", "sans-serif"],
+},
+```
+
+This design system will give **Little Loom** a cohesive, premium identity while remaining approachable and family-friendly. It also maps cleanly to a React + Tailwind CSS component architecture, making it easy to maintain and scale as your catalog grows.

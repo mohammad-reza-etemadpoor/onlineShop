@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tailwindcss/preflight.css"
+  layer(base);
 
 :root {
   --background: #ffffff;
@@ -12,6 +14,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-gray-50: oklch(
+    0.984 0.003 247.858
+  );
+  --color-secondary: oklch(
+    98.3% 0.019 87.5
+  );
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -20,7 +31,9 @@
 }
 
 body {
-  background: var(--background);
+  /* background: var(--background); */
+  /* background: #fff9eb; */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    Arial, Helvetica, sans-serif;
 }

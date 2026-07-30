@@ -1,0 +1,77 @@
+export const metadata = {
+  title: "TinyNest | Premium Baby Clothing & Essentials",
+  description:
+    "Discover premium baby clothing designed for comfort, softness, and everyday adventures. Shop high-quality newborn and toddler outfits made with love and gentle fabrics.",
+
+  keywords: [
+    "baby clothing",
+    "baby clothes",
+    "newborn clothing",
+    "toddler clothes",
+    "baby outfits",
+    "organic baby clothes",
+    "baby fashion",
+    "baby essentials",
+    "kids clothing",
+    "premium baby wear",
+    "baby shop",
+    "online baby store",
+    "TinyNest",
+  ],
+
+  authors: [{ name: "TinyNest" }],
+  creator: "TinyNest",
+  publisher: "TinyNest",
+
+  metadataBase: new URL("https://tinynest.com"),
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    title: "TinyNest | Premium Baby Clothing & Essentials",
+    description:
+      "Soft, comfortable, and beautifully designed baby clothing for newborns and toddlers. Premium quality made for little moments.",
+    url: "https://tinynest.com",
+    siteName: "TinyNest",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "TinyNest Premium Baby Clothing",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "TinyNest | Premium Baby Clothing",
+    description:
+      "Premium baby clothing crafted for comfort, softness, and everyday adventures.",
+    images: ["/og-image.jpg"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-32x32.png",
+    apple: "/apple-touch-icon.png",
+  },
+
+  category: "shopping",
+};
