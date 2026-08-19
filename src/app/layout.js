@@ -4,6 +4,10 @@ import {
   Geist_Mono,
 } from "next/font/google";
 import "./globals.css";
+import Order from "@src/models/Order";
+import { auth } from "@src/lib/auth";
+import User from "@src/models/User";
+import { getProductsOrder } from "@src/actions/productActions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +28,8 @@ export const metadata = {
 export default async function RootLayout({
   children,
 }) {
+  // console.log(await auth());
+  // await getProductsOrder();
   return (
     <html
       lang="en"

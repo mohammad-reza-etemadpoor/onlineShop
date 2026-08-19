@@ -37,11 +37,11 @@ export async function phoneNumberLoginAction(
   }
 
   // Send SMS here...
-  console.log(
-    submission.value.contactNumber,
-    // "<<<<<<<formData>>>>>>>",
-    // formData,
-  );
+  // console.log(
+  //   submission.value.contactNumber,
+  //   // "<<<<<<<formData>>>>>>>",
+  //   // formData,
+  // );
 
   await connectToDb();
   //searching for active code
@@ -302,8 +302,176 @@ export async function updateProfileAction(
       runValidators: true,
     },
   );
-
+  revalidatePath("/profile");
   return submission.reply({
     resetForm: false,
   });
+}
+
+//! ///////////////////////////////////////////
+
+import ProductInventory from "@src/models/ProductInventory";
+import Order from "@src/models/Order";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+
+// بعداً این را از Auth.js می‌گیری
+// import { auth } from "@/auth";
+
+export async function checkoutAction(
+  formData,
+) {
+  await connectToDb();
+
+  const cart = JSON.parse(
+    formData.get("cart"),
+  );
+
+  if (
+    !Array.isArray(cart) ||
+    cart.length === 0
+  ) {
+    throw new Error("Cart is empty");
+  }
+
+  for (const item of cart) {
+    if (!item.inventoryId) {
+      throw new Error(
+        "Invalid inventory",
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        item.quantity,
+      ) ||
+      item.quantity < 1
+    ) {
+      throw new Error(
+        "Invalid quantity",
+      );
+    }
+  }
+
+  // بعداً از Auth.js می‌آید
+
+  const session = await auth();
+  if (!session)
+    throw new Error("Unauthorized");
+  // console.log(
+  //   "sessssssssssssssion",
+  //   session,
+  // );
+  const inventoryIds = cart.map(
+    (item) => item.inventoryId,
+  );
+
+  const inventories =
+    await ProductInventory.find({
+      _id: {
+        $in: inventoryIds,
+      },
+    })
+      .populate("product")
+      .lean();
+
+  if (
+    inventories.length !== cart.length
+  ) {
+    throw new Error(
+      "Some products do not exist.",
+    );
+  }
+
+  const orderItems = [];
+
+  let totalPrice = 0;
+
+  for (const cartItem of cart) {
+    const inventory = inventories.find(
+      (item) =>
+        String(item._id) ===
+        cartItem.inventoryId,
+    );
+
+    if (!inventory) {
+      throw new Error(
+        "Inventory not found.",
+      );
+    }
+
+    if (
+      inventory.stock <
+      cartItem.quantity
+    ) {
+      throw new Error(
+        `${inventory.product.title} does not have enough stock.`,
+      );
+    }
+
+    const price =
+      inventory.product.finalPrice ??
+      inventory.product.price;
+
+    totalPrice +=
+      price * cartItem.quantity;
+
+    orderItems.push({
+      product: inventory.product._id,
+
+      inventory: inventory._id,
+
+      quantity: cartItem.quantity,
+
+      unitPrice: price,
+    });
+  }
+  const { _id: userId } =
+    await User.findOne(
+      {
+        phone: session.user.phone,
+      },
+      { id: 1 },
+    );
+
+  const existingOrder =
+    await Order.findOne({
+      user: userId,
+      paymentStatus: "unpaid",
+    });
+  //todo [...OrderDb, ...localStorage]
+  //todo we must avoid spaming new orders on submit
+  // console.log(
+  //   "userIIIIIIIIIIIIIIIIIIIIIIIIdddddd",
+  //   userId,
+  //   orderItems,
+  // );
+
+  // console.log(orderItems);
+
+  const order = await Order.create({
+    // بعداً از session می‌آید
+    user: userId,
+
+    // user: "687000000000000000000001",
+
+    items: orderItems,
+
+    totalPrice,
+
+    status: "pending",
+
+    paymentStatus: "unpaid",
+  });
+  if (existingOrder) {
+    await Order.findOneAndDelete({
+      _id: existingOrder._id,
+    });
+  }
+  // console.log("existingOrder");
+  // console.log(existingOrder);
+
+  redirect(
+    `/profile?order=${order._id}`,
+  );
 }

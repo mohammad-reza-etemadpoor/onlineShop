@@ -22,12 +22,28 @@ import Field from "./Field";
 import { updateProfileSchema } from "@src/lib/zodSchemas";
 import { updateProfileAction } from "@src/app/actions";
 
+import DatePicker from "react-multi-date-picker";
+import DateObject from "react-date-object";
+
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+
 export default function UserInfoCard({
   user,
 }) {
   const [editing, setEditing] =
     useState(false);
+
   const formRef = useRef(null);
+
+  const [birthDate, setBirthDate] =
+    useState(
+      user?.birthDate
+        ? new DateObject(
+            user?.birthDate,
+          ).convert(persian, persian_fa)
+        : null,
+    );
 
   const [lastResult, action, pending] =
     useActionState(
@@ -48,8 +64,14 @@ export default function UserInfoCard({
 
     shouldRevalidate: "onInput",
   });
+
+  // useEffect(() => {
+  //   console.log("useEffect", birthDate);
+  // }, [birthDate]);
+
   useEffect(() => {
-    console.log(lastResult);
+    // console.log(lastResult);
+
     if (
       lastResult?.status === "success"
     ) {
@@ -87,7 +109,7 @@ export default function UserInfoCard({
               form={form.id}
               type="submit"
               disabled={pending}
-              className="flex items-center cursor-pointer gap-2 rounded-xl bg-green-500 px-4 py-2 text-white disabled:opacity-60"
+              className="flex items-center hover:brightness-75 cursor-pointer gap-2 rounded-xl bg-green-500 px-4 py-2 text-white disabled:opacity-60"
             >
               <IoCheckmarkOutline />
 
@@ -100,9 +122,20 @@ export default function UserInfoCard({
               type="button"
               onClick={() => {
                 formRef?.current?.reset();
+
+                setBirthDate(
+                  user?.birthDate
+                    ? new DateObject(
+                        user.birthDate,
+                      ).convert(
+                        persian,
+                        persian_fa,
+                      )
+                    : null,
+                );
                 setEditing(false);
               }}
-              className="flex items-center gap-2 rounded-xl bg-gray-200 px-4 py-2"
+              className="flex items-center cursor-pointer hover:brightness-75 gap-2 rounded-xl bg-gray-200 px-4 py-2"
             >
               <IoCloseOutline />
               Cancel
@@ -152,9 +185,45 @@ export default function UserInfoCard({
             defaultValue={
               user.nationalId
             }
+            className="rounded-sm bg-gray-100 px-4 py-3"
           />
+          <div className="flex flex-col gap-2">
+            <label className="block text-sm font-medium text-gray-600">
+              Birth Date
+            </label>
+            <DatePicker
+              onChange={(
+                dateObject,
+              ) => {
+                setBirthDate(
+                  dateObject,
+                );
+              }}
+              value={birthDate}
+              calendar={persian}
+              locale={persian_fa}
+              inputClass={`rounded-xl w-full px-4 py-3 ${editing ? "border border-gray-300 outline-none transition focus:border-[#F9E34F] " : "bg-gray-100"}`}
+              disabled={!editing}
+              placeholder="تاریخ تولد را وارد کنید"
+            />
 
-          <Field
+            <input
+              type="hidden"
+              name={
+                fields.birthDate.name
+              }
+              key={fields.birthDate.key}
+              value={
+                birthDate
+                  ? birthDate
+                      ?.toDate()
+                      .toISOString()
+                  : ""
+              }
+            />
+          </div>
+
+          {/* <Field
             label="Birth Date"
             type="date"
             field={fields.birthDate}
@@ -164,7 +233,7 @@ export default function UserInfoCard({
                 "T",
               )[0]
             }
-          />
+          /> */}
 
           <div>
             <label

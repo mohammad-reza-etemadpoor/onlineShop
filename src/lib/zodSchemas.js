@@ -1,8 +1,8 @@
 import { z } from "zod";
 
+//#region phone
 const IRAN_PHONE_REGEX =
   /^(0[1-9]\d{9}|09[1-9]\d{8})$/;
-
 export const phoneNumberSchema =
   z.object({
     contactNumber: z
@@ -19,7 +19,9 @@ export const phoneNumberSchema =
         message: "شماره معتبر نیست",
       }),
   });
+//#endregion
 
+//#region otp
 export const otpCodeSchema = z.object({
   otpNumber: z
     .string({
@@ -46,7 +48,9 @@ export const otpCodeSchema = z.object({
       message: "شماره معتبر نیست ",
     }),
 });
+//#endregion
 
+//#region profile
 export const updateProfileSchema =
   z.object({
     firstName: z
@@ -100,3 +104,79 @@ export const updateProfileSchema =
       .min(10, "Address is too short.")
       .max(300),
   });
+//endregion
+
+//#region product
+export const productSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Product name is required")
+    .max(
+      100,
+      "Product name is too long",
+    ),
+
+  description: z
+    .string()
+    .min(1, "Description is required"),
+
+  category: z.enum([
+    "Girls",
+    "Boys",
+    "Newborn",
+    "Maternity",
+  ]),
+
+  tags: z.array(z.string()).default([]),
+
+  images: z
+    .array(z.string())
+    .min(
+      1,
+      "At least one image is required",
+    ),
+
+  price: z
+    .number()
+    .min(0, "Price cannot be negative"),
+
+  discount: z.number().min(0).max(100),
+
+  material: z.string().optional(),
+
+  featured: z.boolean().default(false),
+
+  isActive: z.boolean().default(true),
+
+  variants: z
+    .array(
+      z.object({
+        color: z.object({
+          name: z
+            .string()
+            .min(
+              1,
+              "Color name is required",
+            ),
+
+          hex: z
+            .string()
+            .min(
+              1,
+              "Color is required",
+            ),
+        }),
+
+        size: z.string(),
+
+        stock: z.number().int().min(0),
+
+        barcode: z.string().optional(),
+      }),
+    )
+    .min(
+      1,
+      "At least one variant is required",
+    ),
+});
+//endregion

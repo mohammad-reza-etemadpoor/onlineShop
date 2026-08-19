@@ -1,50 +1,82 @@
 "use client";
 
-import { IoChevronForwardOutline } from "react-icons/io5";
-
-const statusColors = {
-  Processing:
-    "bg-amber-100 text-amber-700",
-  Delivered:
-    "bg-green-100 text-green-700",
-  Cancelled: "bg-red-100 text-red-600",
-};
+import Image from "next/image";
 
 export default function OrderItem({
-  order,
+  item,
 }) {
+  console.log(
+    "DataTransferItemList",
+    item,
+    item.quantity,
+  );
+  const images = item.product.images;
+  const title = item.product.title;
+
   return (
-    <button className="flex w-full items-center justify-between rounded-xl border border-gray-200 p-5 transition hover:border-[#F9E34F] hover:shadow-md">
-      <div className="flex flex-col items-start gap-2">
-        <h3 className="text-lg font-semibold">
-          Order #{order.id}
-        </h3>
+    <div className="flex gap-5 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      {/* Product Image */}
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-          <span>
-            {order.items} Items
-          </span>
-
-          <span>•</span>
-
-          <span>{order.total}</span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-5">
-        <span
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
-            statusColors[order.status]
-          }`}
-        >
-          {order.status}
-        </span>
-
-        <IoChevronForwardOutline
-          size={22}
-          className="text-gray-400"
+      <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl">
+        <Image
+          src={images[0]}
+          alt={title}
+          fill
+          className="object-cover"
         />
       </div>
-    </button>
+
+      {/* Product Info */}
+
+      <div className="flex flex-1 flex-col justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {title}
+          </h3>
+
+          <div className="mt-3 flex flex-wrap gap-6 text-sm text-gray-600">
+            <p>
+              <span className="font-medium">
+                Size:
+              </span>{" "}
+              {item.inventory.size}
+            </p>
+
+            <p>
+              <span className="font-medium">
+                Color:
+              </span>{" "}
+              {
+                item.inventory.color
+                  .name
+              }
+            </p>
+
+            <p>
+              <span className="font-medium">
+                Quantity:
+              </span>{" "}
+              {item.quantity};
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-lg font-bold text-gray-900">
+            {item.product.finalPrice.toLocaleString()}{" "}
+            Toman
+          </p>
+
+          <p className="text-sm text-gray-500">
+            Total:{" "}
+            {(
+              item.product.finalPrice *
+              item.quantity
+            ).toLocaleString()}{" "}
+            Toman
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

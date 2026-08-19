@@ -1,251 +1,214 @@
 "use client";
+// const { cartItems } = useCart();
+// // console.log(cartItems);
+// const [cart, setCart] = useState([]);
+// // initialCart,
+// const [isLoading, setIsLoading] =
+//   useState(false);
+// useEffect(() => {
+//   const fetchProducts = async () => {
+//     setIsLoading(true);
+//     try {
+//       const data =
+//         await findProductsById(
+//           cartItems,
+//         );
+//       setCart(data);
+//     } catch (err) {
+//       console.log("Error: ", err);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+//   fetchProducts();
+// }, []);
 
-import { findProductsById } from "@src/actions/productActions";
-import { useCart } from "@src/context/CartContext";
-import Image from "next/image";
+const context = {
+  description:
+    "Soft cotton romper with adorable bunny print.",
+
+  id: "6a6aac3fc099184b362f3e84",
+
+  images:
+    Array[
+      ("/baby-clothe-0.jpg",
+      "/products/bunny-romper-2.jpg")
+    ],
+
+  price: 420000,
+
+  quantity: 1,
+
+  selectedColor: "",
+
+  selectedInventoryId: "",
+
+  selectedSize: "",
+
+  slug: "cute-bunny-romper",
+
+  title: "Cute Bunny Romper",
+
+  // variants: Array [ {…}, {…} ],
+
+  length: 1,
+};
+
+const orderFromDb = {
+  // _id: new ObjectId(
+  //   "6a6d8da88541aedb1d2c503a",
+  // ),
+  // user: new ObjectId(
+  //   "6a67776ad19f0235792e6c7f",
+  // ),
+  items: [
+    {
+      //   product: new ObjectId(
+      //     "6a6aac3fc099184b362f3e84",
+      //   ),
+      //   inventory: new ObjectId(
+      //     "6a6aac3fc099184b362f3e98",
+      //   ),
+      //   quantity: 1,
+      //   unitPrice: 420000,
+      //   _id: new ObjectId(
+      //     "6a6d8da88541aedb1d2c503b",
+      //   ),
+      // },
+      // {
+      //   product: new ObjectId(
+      //     "6a6aac3fc099184b362f3e85",
+      //   ),
+      //   inventory: new ObjectId(
+      //     "6a6aac3fc099184b362f3e9b",
+      //   ),
+      //   quantity: 2,
+      //   unitPrice: 360000,
+      //   _id: new ObjectId(
+      //     "6a6d8da88541aedb1d2c503c",
+      //   ),
+      // },
+      // {
+      //   product: new ObjectId(
+      //     "6a6aac3fc099184b362f3e86",
+      //   ),
+      //   inventory: new ObjectId(
+      //     "6a6aac3fc099184b362f3e9d",
+      //   ),
+      //   quantity: 3,
+      //   unitPrice: 690000,
+      //   _id: new ObjectId(
+      //     "6a6d8da88541aedb1d2c503d",
+      //   ),
+    },
+  ],
+  totalPrice: 3210000,
+  status: "pending",
+  paymentStatus: "unpaid",
+  // createdAt: 2026-08-01T06:09:44.163Z,
+  // updatedAt: 2026-08-01T06:09:44.163Z,
+  // __v: 0
+};
+
 import {
   useEffect,
   useState,
 } from "react";
+import Image from "next/image";
+
 import {
   IoAdd,
   IoRemove,
   IoTrashOutline,
 } from "react-icons/io5";
 
-// const initialCart = [
-//   {
-//     id: 1,
-//     title: "Soft Cotton Romper",
-//     image: "/baby-clothe-0.jpg",
+import {
+  findProductsById,
+  getProductsOrder,
+  mergeCartAction,
+} from "@src/actions/productActions";
+import { useCart } from "@src/context/CartContext";
+import { checkoutAction } from "../actions";
 
-//     price: 24.99,
-
-//     quantity: 2,
-
-//     selectedColor: "Pink",
-
-//     colors: [
-//       {
-//         name: "Pink",
-//         hex: "#F8BBD0",
-//       },
-//       {
-//         name: "White",
-//         hex: "#FFFFFF",
-//       },
-//       {
-//         name: "Beige",
-//         hex: "#E6D3B3",
-//       },
-//     ],
-//   },
-
-//   {
-//     id: 2,
-//     title: "Baby Hoodie",
-
-//     image: "/baby-clothe-1.jpg",
-
-//     price: 31.99,
-
-//     quantity: 1,
-
-//     selectedColor: "Blue",
-
-//     colors: [
-//       {
-//         name: "Blue",
-//         hex: "#90CAF9",
-//       },
-//       {
-//         name: "Gray",
-//         hex: "#BDBDBD",
-//       },
-//     ],
-//   },
-// ];
-// {
-//     _id: '6a5fa6971512f7e841b70e8c',
-//     title: 'Floral Summer Dress',
-//     description: 'Soft floral cotton dress for girls, perfect for warm summer days.',
-//     category: 'Girls',
-//     tags: [ 'dress', 'summer', 'cotton' ],
-//     images: [ '/baby-clothe-0.jpg' ],
-//     price: 39.99,
-//     discount: 10,
-//     colors: [ [Object], [Object] ],
-//     sizes: [ '2Y', '3Y', '4Y' ],
-//     totalStock: 20,
-//     material: '100% Cotton',
-//     __v: 0,
-//     createdAt: '2026-07-21T17:04:23.943Z',
-//     updatedAt: '2026-07-21T17:04:23.943Z',
-//     quantity: 1
-//   },
-
-[
-  {
-    product: {
-      _id: "6a6aac3fc099184b362f3e84",
-      title: "Cute Bunny Romper",
-      slug: "cute-bunny-romper",
-      description:
-        "Soft cotton romper with adorable bunny print.",
-      category: "Newborn",
-      tags: [Array],
-      images: [Array],
-      price: 420000,
-      discount: 10,
-      material: "100% Cotton",
-      featured: true,
-      isActive: true,
-      __v: 0,
-      createdAt:
-        "2026-07-30T01:43:27.798Z",
-      updatedAt:
-        "2026-07-30T01:43:27.798Z",
-    },
-    color: {
-      name: "Pink",
-      hex: "#FFC0CB",
-    },
-    size: "NB",
-    stock: 9,
-    barcode: "",
-    __v: 0,
-    createdAt:
-      "2026-07-30T01:43:27.874Z",
-    updatedAt:
-      "2026-07-30T01:43:27.874Z",
-    quantity: 1,
-    id: "6a6aac3fc099184b362f3e98",
-  },
-  {
-    product: {
-      _id: "6a6aac3fc099184b362f3e84",
-      title: "Cute Bunny Romper",
-      slug: "cute-bunny-romper",
-      description:
-        "Soft cotton romper with adorable bunny print.",
-      category: "Newborn",
-      tags: [Array],
-      images: [Array],
-      price: 420000,
-      discount: 10,
-      material: "100% Cotton",
-      featured: true,
-      isActive: true,
-      __v: 0,
-      createdAt:
-        "2026-07-30T01:43:27.798Z",
-      updatedAt:
-        "2026-07-30T01:43:27.798Z",
-    },
-    color: {
-      name: "Pink",
-      hex: "#FFC0CB",
-    },
-    size: "0-3M",
-    stock: 4,
-    barcode: "",
-    __v: 0,
-    createdAt:
-      "2026-07-30T01:43:27.874Z",
-    updatedAt:
-      "2026-07-30T01:43:27.874Z",
-    quantity: 1,
-    id: "6a6aac3fc099184b362f3e99",
-  },
-  {
-    product: {
-      _id: "6a6aac3fc099184b362f3e85",
-      title: "Little Bear Bodysuit",
-      slug: "little-bear-bodysuit",
-      description:
-        "Comfortable everyday baby bodysuit.",
-      category: "Newborn",
-      tags: [Array],
-      images: [Array],
-      price: 360000,
-      discount: 0,
-      material: "Cotton",
-      featured: false,
-      isActive: true,
-      __v: 0,
-      createdAt:
-        "2026-07-30T01:43:27.802Z",
-      updatedAt:
-        "2026-07-30T01:43:27.802Z",
-    },
-    color: {
-      name: "Pink",
-      hex: "#FFC0CB",
-    },
-    size: "NB",
-    stock: 1,
-    barcode: "",
-    __v: 0,
-    createdAt:
-      "2026-07-30T01:43:27.875Z",
-    updatedAt:
-      "2026-07-30T01:43:27.875Z",
-    quantity: 1,
-    id: "6a6aac3fc099184b362f3e9a",
-  },
-];
 export default function CartPage() {
   const { cartItems } = useCart();
-  // console.log(cartItems);
+
   const [cart, setCart] = useState([]);
-  // initialCart,
   const [isLoading, setIsLoading] =
     useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
+
       try {
-        const data =
+        const contextData =
           await findProductsById(
             cartItems,
           );
-        setCart(data);
+        const DbData =
+          await getProductsOrder();
+
+        setCart([
+          ...contextData,
+          ...DbData,
+        ]);
+        // console.log(
+        //   // await getOrderProducts(),
+        //   contextData,
+        //   cartItems,
+        //   "daaaaaaaaaataaaaaa666666666666666666666666666666666:",
+        // );
       } catch (err) {
-        console.log("Error: ", err);
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
   const increase = (id) => {
     setCart((items) =>
-      items.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity:
-                item.quantity + 1,
-            }
-          : item,
-      ),
+      items.map((item) => {
+        if (item.id !== id) return item;
+
+        const variant =
+          item.variants.find(
+            (v) =>
+              v.inventoryId ===
+              item.selectedInventoryId,
+          );
+
+        if (!variant) return item;
+
+        if (
+          item.quantity >= variant.stock
+        )
+          return item;
+
+        return {
+          ...item,
+          quantity: item.quantity + 1,
+        };
+      }),
     );
   };
 
   const decrease = (id) => {
     setCart((items) =>
-      items.map((item) =>
-        item.id === id &&
-        item.quantity > 1
-          ? {
-              ...item,
-              quantity:
-                item.quantity - 1,
-            }
-          : item,
-      ),
+      items.map((item) => {
+        if (item.id !== id) return item;
+
+        if (item.quantity === 1)
+          return item;
+
+        return {
+          ...item,
+          quantity: item.quantity - 1,
+        };
+      }),
     );
   };
 
@@ -257,155 +220,269 @@ export default function CartPage() {
     );
   };
 
-  const changeColor = (id, color) => {
+  const changeSize = (id, size) => {
     setCart((items) =>
-      items.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              selectedColor: color,
-            }
-          : item,
-      ),
+      items.map((item) => {
+        if (item.id !== id) return item;
+
+        return {
+          ...item,
+          selectedSize: size,
+          selectedColor: "",
+          selectedInventoryId: "",
+          quantity: 1,
+        };
+      }),
     );
   };
 
-  cart.map((item) => {
-    console.log(item.price);
-  });
+  const changeColor = (id, color) => {
+    setCart((items) =>
+      items.map((item) => {
+        if (item.id !== id) return item;
 
-  const subtotal = cart.reduce(
-    (total, item) =>
-      total +
-      Number(item.price) *
-        Number(item.quantity),
+        const variant =
+          item.variants.find(
+            (v) =>
+              v.size ===
+                item.selectedSize &&
+              v.color === color,
+          );
+
+        if (!variant) return item;
+
+        return {
+          ...item,
+          selectedColor: color,
+          selectedInventoryId:
+            variant.inventoryId,
+          quantity: 1,
+        };
+      }),
+    );
+  };
+
+  const subtotal = cart?.reduce(
+    (total, item) => {
+      return (
+        total +
+        item.price * item.quantity
+      );
+    },
     0,
-  );
-  console.log(
-    "0000000000",
-    cartItems[0]?.price,
-    subtotal,
   );
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 text-zinc-600">
+    <section className="mx-auto max-w-7xl px-4 py-16 text-zinc-700">
       <h1 className="mb-10 text-4xl font-bold text-[#FFF9EB]">
         Shopping Cart
       </h1>
 
       <div className="grid gap-10 lg:grid-cols-[2fr_380px]">
-        {/* Cart Items */}
+        {/* =========================
+          Cart Items
+      ========================== */}
 
         <div className="space-y-6">
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col gap-6 rounded-3xl border bg-gray-200 p-6 shadow-sm md:flex-row"
-            >
-              {/* Image */}
+          {cart?.map((item) => {
+            const sizes = [
+              ...new Set(
+                item.variants.map(
+                  (variant) =>
+                    variant.size,
+                ),
+              ),
+            ];
 
-              <div className="relative aspect-square h-40 overflow-hidden rounded-2xl">
-                <Image
-                  src={item.images[0]}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              {console.log(item)}
-              {/* Content */}
+            const colors = [
+              ...new Set(
+                item.variants
+                  .filter(
+                    (variant) =>
+                      variant.size ===
+                      item.selectedSize,
+                  )
+                  .map(
+                    (variant) =>
+                      variant.color,
+                  ),
+              ),
+            ];
 
-              <div className="flex flex-1 flex-col">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold">
-                      {item.title}
-                    </h2>
+            const selectedVariant =
+              item.variants.find(
+                (variant) =>
+                  variant.inventoryId ===
+                  item.selectedInventoryId,
+              );
 
-                    <p className="mt-2 text-2xl font-bold">
-                      ${item.price}
+            return (
+              <div
+                key={item.id}
+                className="flex flex-col gap-6 rounded-3xl border bg-gray-200 p-6 shadow-sm md:flex-row"
+              >
+                {/* Image */}
+
+                <div className="relative aspect-square h-40 overflow-hidden rounded-2xl">
+                  <Image
+                    src={item.images[0]}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                {/* Content */}
+
+                <div className="flex flex-1 flex-col">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold">
+                        {item.title}
+                      </h2>
+
+                      <p className="mt-2 text-2xl font-bold">
+                        $
+                        {item.price.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        removeItem(
+                          item.id,
+                        )
+                      }
+                      className="ml-2 text-zinc-400 transition hover:text-red-500"
+                    >
+                      <IoTrashOutline
+                        size={24}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Size */}
+
+                  <div className="mt-6">
+                    <p className="mb-2 text-sm font-medium">
+                      Size
                     </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {sizes.map(
+                        (size) => (
+                          <button
+                            key={size}
+                            onClick={() =>
+                              changeSize(
+                                item.id,
+                                size,
+                              )
+                            }
+                            className={`rounded-xl border px-4 py-2 transition ${
+                              item.selectedSize ===
+                              size
+                                ? "border-[#F9E34F] bg-[#F9E34F]"
+                                : "border-gray-300 bg-white hover:border-[#F9E34F]"
+                            }`}
+                          >
+                            {size}
+                          </button>
+                        ),
+                      )}
+                    </div>
                   </div>
 
-                  <button
-                    onClick={() =>
-                      removeItem(
-                        item.id,
-                      )
-                    }
-                    className="text-zinc-400 transition ml-2 hover:text-red-500"
-                  >
-                    <IoTrashOutline
-                      size={24}
-                    />
-                  </button>
-                </div>
+                  {/* Color */}
 
-                {/* Colors */}
+                  {item.selectedSize && (
+                    <div className="mt-6">
+                      <p className="mb-2 text-sm font-medium">
+                        Color
+                      </p>
 
-                <div className="mt-6">
-                  <p className="mb-3 text-sm font-medium">
-                    Color
-                  </p>
+                      <div className="flex flex-wrap gap-2">
+                        {colors.map(
+                          (color) => (
+                            <button
+                              key={
+                                color
+                              }
+                              onClick={() =>
+                                changeColor(
+                                  item.id,
+                                  color,
+                                )
+                              }
+                              className={`rounded-xl border px-4 py-2 transition ${
+                                item.selectedColor ===
+                                color
+                                  ? "border-[#F9E34F] bg-[#F9E34F]"
+                                  : "border-gray-300 bg-white hover:border-[#F9E34F]"
+                              }`}
+                            >
+                              {color}
+                            </button>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex gap-3">
-                    {item.colorAndSizes.map(
-                      (color) => (
-                        <button
-                          key={color[0]}
-                          onClick={() =>
-                            changeColor(
-                              item.id,
-                              color[0],
-                            )
-                          }
-                          className={`h-8 w-8 rounded-full border-2 transition ${
-                            item.selectedColor ===
-                            color[0]
-                              ? "border-zinc-900"
-                              : "border-transparent"
-                          }`}
-                          style={{
-                            backgroundColor:
-                              color[1],
-                          }}
-                        />
-                      ),
-                    )}
+                  {/* Stock */}
+
+                  {selectedVariant && (
+                    <p className="mt-5 text-sm text-green-600">
+                      {
+                        selectedVariant.stock
+                      }{" "}
+                      in stock
+                    </p>
+                  )}
+
+                  {/* Quantity */}
+
+                  <div className="mt-8 flex items-center gap-4">
+                    <button
+                      disabled={
+                        !item.selectedInventoryId
+                      }
+                      onClick={() =>
+                        decrease(
+                          item.id,
+                        )
+                      }
+                      className="rounded-full border bg-white p-2 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <IoRemove />
+                    </button>
+
+                    <span className="w-8 text-center text-lg font-semibold">
+                      {item.quantity}
+                    </span>
+
+                    <button
+                      disabled={
+                        !item.selectedInventoryId
+                      }
+                      onClick={() =>
+                        increase(
+                          item.id,
+                        )
+                      }
+                      className="rounded-full border bg-white p-2 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <IoAdd />
+                    </button>
                   </div>
-                </div>
-
-                {/* Quantity */}
-
-                <div className="mt-8 flex items-center gap-4">
-                  <button
-                    onClick={() =>
-                      decrease(item.id)
-                    }
-                    className="rounded-full border p-2"
-                  >
-                    <IoRemove />
-                  </button>
-
-                  <span className="w-8 text-center text-lg font-semibold">
-                    {item.quantity}
-                  </span>
-
-                  <button
-                    onClick={() =>
-                      increase(item.id)
-                    }
-                    className="rounded-full border p-2"
-                  >
-                    <IoAdd />
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Summary */}
+        {/* =========================
+          Order Summary
+      ========================== */}
 
         <div className="h-fit rounded-3xl border bg-[#FFF9EB] p-8 shadow-sm">
           <h2 className="text-2xl font-bold">
@@ -417,7 +494,8 @@ export default function CartPage() {
               <span>Subtotal</span>
 
               <span>
-                ${subtotal.toFixed(2)}
+                $
+                {subtotal?.toLocaleString()}
               </span>
             </div>
 
@@ -433,14 +511,46 @@ export default function CartPage() {
               <span>Total</span>
 
               <span>
-                ${subtotal.toFixed(2)}
+                $
+                {subtotal?.toLocaleString()}
               </span>
             </div>
           </div>
 
-          <button className="cursor-pointer mt-8 w-full rounded-full bg-[#F9E34F] py-4 font-semibold transition hover:brightness-95">
-            Proceed to Checkout
-          </button>
+          <form action={checkoutAction}>
+            <input
+              type="hidden"
+              name="cart"
+              value={JSON.stringify(
+                cart?.map((item) => ({
+                  inventoryId:
+                    item.selectedInventoryId,
+                  quantity:
+                    item.quantity,
+                })),
+              )}
+            />
+            <button
+              type="submit"
+              disabled={cart?.some(
+                (item) =>
+                  !item.selectedInventoryId,
+              )}
+              className="mt-8 w-full rounded-full bg-[#F9E34F] py-4 font-semibold transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Proceed to Checkout
+            </button>
+          </form>
+
+          {cart?.some(
+            (item) =>
+              !item.selectedInventoryId,
+          ) && (
+            <p className="mt-4 text-center text-sm text-red-500">
+              Please select a size and a
+              color for all products.
+            </p>
+          )}
         </div>
       </div>
     </section>
