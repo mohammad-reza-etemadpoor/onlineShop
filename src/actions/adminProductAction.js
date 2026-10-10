@@ -345,3 +345,173 @@ export async function getProducts({
   );
 }
 //#endregion
+
+export async function getProductById(
+  prodId,
+) {
+  if (!prodId) {
+    return {
+      success: false,
+      product: null,
+      variants: [],
+    };
+  }
+
+  await connectToDb();
+
+  const product =
+    await Product.findById(
+      prodId,
+    ).lean();
+
+  if (!product) {
+    return {
+      success: false,
+      product: null,
+      variants: [],
+    };
+  }
+
+  const variants =
+    await ProductInventory.find({
+      product: product._id,
+    }).lean();
+
+  return {
+    success: true,
+    product,
+    variants,
+  };
+}
+
+export async function updateProduct(
+  prodId,
+  previousState,
+  formData,
+) {
+  console.log("Posted product form:", [
+    ...formData.entries(),
+  ]);
+
+  const submission = parseWithZod(
+    formData,
+    {
+      schema: productSchema,
+    },
+  );
+
+  if (submission.status !== "success") {
+    console.log(
+      "Product validation failed:",
+      submission.error,
+    );
+
+    return {
+      submission: submission.reply(),
+    };
+  }
+
+  if (!prodId) {
+    return {
+      success: false,
+      error: "Product ID is required",
+    };
+  }
+
+  await connectToDb();
+
+  try {
+    const { variants, ...productData } =
+      submission.value;
+
+    // =========================================
+    // 1. Update Product
+    // =========================================
+
+    const product =
+      await Product.findByIdAndUpdate(
+        prodId,
+        productData,
+        {
+          new: true,
+          runValidators: true,
+        },
+      );
+
+    if (!product) {
+      return {
+        success: false,
+        error: "Product not found",
+      };
+    }
+
+    // =========================================
+    // 2. Update Product Inventory
+    // =========================================
+
+    await Promise.all(
+      variants.map(async (variant) => {
+        const {
+          _id,
+          color,
+          size,
+          stock,
+          barcode,
+        } = variant;
+
+        if (!_id) {
+          throw new Error(
+            "Inventory ID is missing",
+          );
+        }
+
+        const inventory =
+          await ProductInventory.findOneAndUpdate(
+            {
+              _id,
+              product: prodId,
+            },
+            {
+              color: {
+                name: color.name,
+                hex: color.hex,
+              },
+              size,
+              stock,
+              barcode,
+            },
+            {
+              new: true,
+              runValidators: true,
+            },
+          );
+
+        if (!inventory) {
+          throw new Error(
+            `Inventory ${_id} not found`,
+          );
+        }
+
+        return inventory;
+      }),
+    );
+
+    return {
+      success: true,
+      product: product.toObject(),
+    };
+  } catch (error) {
+    console.error(
+      "Update product error:",
+      error,
+    );
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update product",
+    };
+  }
+}

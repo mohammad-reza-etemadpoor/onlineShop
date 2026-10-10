@@ -66,14 +66,15 @@ const productSchema =
         default: "",
       },
 
-      featured: {
-        type: Boolean,
-        default: false,
-      },
+      // featured: {
+      //   type: Boolean,
+      //   default: false,
+      // },
 
       isActive: {
         type: Boolean,
         default: true,
+        enum: [true, false],
       },
     },
     {

@@ -45,6 +45,7 @@ export function AdminProductProvider({
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
+
       const data = await getProducts({
         search,
         category,
@@ -53,19 +54,26 @@ export function AdminProductProvider({
         page,
         pageSize,
       });
+
       // console.log(
       //   "context is : \n",
       //   data,
       // );
+
       setProducts(data);
+
       setLoading(false);
     }
     fetchProducts();
   }, [
     search,
+
     category,
+
     status,
+
     sort,
+
     page,
   ]);
 

@@ -49,12 +49,12 @@ export default function ProductsTable() {
     setProducts,
   } = useAdminProductContext();
 
-  useEffect(() => {
-    console.log(
-      "product table: ",
-      products,
-    );
-  }, [products]);
+  // useEffect(() => {
+  //   console.log(
+  //     "product table: ",
+  //     products,
+  //   );
+  // }, [products]);
 
   return (
     <section className="mt-8 overflow-hidden rounded-md border border-zinc-200 bg-white shadow-sm">

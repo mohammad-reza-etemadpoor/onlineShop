@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useActionState,
+  useState,
+} from "react";
 import {
   IoCloseOutline,
   IoCloudUploadOutline,
@@ -10,13 +13,50 @@ import {
 } from "react-icons/io5";
 import AddProductModalGeneral from "./AddProductModalGeneral";
 import { useAddProduct } from "@/src/context/AddProductContext";
-import AddProductModalVariants from "./AddProductModalVariants";
+import { AddProduct } from "@/src/actions/addProductDashboard";
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod/v4";
+import { productSchema } from "@/src/lib/zodSchemas";
+import AddProductModalVariants from "./AddProductVariant1";
 
 export default function AddProductModal({
   onClose,
 }) {
   //   const [activeTab, setActiveTab] =
   //     useState("general");
+
+  const [lastResult, action] =
+    useActionState(
+      AddProduct,
+      undefined,
+    );
+
+  const [form, fields] = useForm({
+    lastResult: lastResult?.submission,
+
+    defaultValue: {
+      variants: [
+        {
+          color: {
+            name: "",
+            hex: "#000000",
+          },
+          size: "",
+          stock: 0,
+          barcode: "",
+        },
+      ],
+    },
+
+    onValidate({ formData }) {
+      return parseWithZod(formData, {
+        schema: productSchema,
+      });
+    },
+
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
 
   const {
     isModalOpen,
@@ -28,11 +68,17 @@ export default function AddProductModal({
   function handleClose() {
     setIsModalOpen(false);
   }
+
   return (
     isModalOpen && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
         {/* Modal */}
-        <div className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+        <form
+          className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+          id={form.id}
+          onSubmit={form.onSubmit}
+          action={action}
+        >
           {/* ================================
             Header
         ================================= */}
@@ -53,73 +99,50 @@ export default function AddProductModal({
           </div>
 
           {/* ================================
-            Tabs
-            ================================= */}
-          <div className="border-b px-7">
-            <div className="flex gap-8">
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveTab(
-                    "general",
-                  )
-                }
-                className={`relative py-4 text-sm font-medium transition ${
-                  activeTab ===
-                  "general"
-                    ? "text-[#D4AF00]"
-                    : "text-zinc-500 hover:text-zinc-800"
-                }`}
-              >
-                General
-                {activeTab ===
-                  "general" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#F9E34F]" />
-                )}
-              </button>
+                  Scrollable Content
+          ================================= */}
 
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveTab(
-                    "variants",
-                  )
-                }
-                className={`relative py-4 text-sm font-medium transition ${
-                  activeTab ===
-                  "variants"
-                    ? "text-[#D4AF00]"
-                    : "text-zinc-500 hover:text-zinc-800"
-                }`}
-              >
-                Variants
-                {activeTab ===
-                  "variants" && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#F9E34F]" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* ================================
-                        Scrollable Content
-                        ================================= */}
           <div className="flex-1 overflow-y-auto px-7 py-6">
-            {/* =================================
-            GENERAL TAB
-            ================================== */}
-            {activeTab ===
-              "general" && (
-              <AddProductModalGeneral />
-            )}
-
-            {/* =================================
-                VARIANTS TAB
-                ================================== */}
-            {activeTab ===
-              "variants" && (
-              <AddProductModalVariants />
-            )}
+            <>
+              <AddProductModalGeneral
+                fields={fields}
+              />
+              {/* <AddProductModalVariant
+                variantCount={
+                  variantCount
+                }
+                fields={fields}
+                onAddVariant={
+                  addVariant
+                }
+                onRemoveVariant={
+                  removeVariant
+                }
+              /> */}
+              <AddProductModalVariants
+                fields={fields}
+                onAddVariant={() =>
+                  form.insert({
+                    name: fields.variants.name,
+                    defaultValue: {
+                      color: {
+                        name: "",
+                        hex: "#000000",
+                      },
+                      size: "",
+                      stock: 0,
+                      barcode: "",
+                    },
+                  })
+                }
+                onRemoveVariant={(index) =>
+                  form.remove({
+                    name: fields.variants.name,
+                    index,
+                  })
+                }
+              />
+            </>
           </div>
 
           {/* ================================
@@ -135,13 +158,13 @@ export default function AddProductModal({
             </button>
 
             <button
-              type="button"
+              type="submit"
               className="cursor-pointer rounded-xl bg-[#F9E34F] px-7 py-3 font-semibold text-zinc-800 transition hover:brightness-95"
             >
               Save Product
             </button>
           </div>
-        </div>
+        </form>
       </div>
     )
   );

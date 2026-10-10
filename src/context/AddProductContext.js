@@ -7,44 +7,83 @@ import {
 } from "react";
 
 const AddProductContext =
-  createContext();
+  createContext(null);
+
+// ======================================================
+// Initial Product
+// ======================================================
+
+const initialProduct = {
+  title: "",
+  description: "",
+  category: "",
+  tags: [],
+  images: [],
+
+  price: "",
+  discount: 0,
+
+  material: "",
+
+  featured: false,
+  isActive: true,
+
+  variants: [],
+};
+
+// ======================================================
+// Add Product Provider
+// ======================================================
 
 export function AddProductProvider({
   children,
 }) {
-  // =========================================
-  // Modal state
-  // =========================================
+  // ====================================================
+  // Modal
+  // ====================================================
 
   const [isModalOpen, setIsModalOpen] =
-    useState(true);
+    useState(false);
+
+  // ====================================================
+  // Active Tab
+  // ====================================================
 
   const [activeTab, setActiveTab] =
     useState("general");
 
-  // =========================================
-  // Product form state
-  // =========================================
+  // ====================================================
+  // Product
+  // ====================================================
 
   const [product, setProduct] =
-    useState({
-      title: "",
-      description: "",
-      category: "",
-      tags: [],
-      images: [],
-      price: "",
-      discount: 0,
-      material: "",
-      featured: false,
-      isActive: true,
+    useState(initialProduct);
 
-      variants: [],
-    });
+  // ====================================================
+  // Variant Errors
+  //
+  // Example:
+  //
+  // {
+  //   1: "This color and size combination already exists."
+  // }
+  // ====================================================
 
-  // =========================================
-  // Update a single product field
-  // =========================================
+  const [
+    variantErrors,
+    setVariantErrors,
+  ] = useState({});
+
+  // ====================================================
+  // Update Product Field
+  //
+  // Example:
+  //
+  // updateProductField(
+  //   "title",
+  //   "Cute Bunny Romper"
+  // );
+  // ====================================================
 
   function updateProductField(
     field,
@@ -56,21 +95,68 @@ export function AddProductProvider({
     }));
   }
 
-  // =========================================
-  // Add a new variant
-  // =========================================
+  // ====================================================
+  // Check Duplicate Variant
+  //
+  // A product cannot have:
+  //
+  // Pink + 0-3M
+  // Pink + 0-3M
+  //
+  // because ProductInventory has a unique index
+  // on:
+  //
+  // product + color.name + size
+  // ====================================================
+
+  function isDuplicateVariant(
+    variants,
+    currentIndex,
+    colorName,
+    size,
+  ) {
+    if (!colorName || !size) {
+      return false;
+    }
+
+    const normalizedColor = colorName
+      .trim()
+      .toLowerCase();
+
+    return variants.some(
+      (variant, index) => {
+        // Don't compare the variant with itself
+        if (index === currentIndex) {
+          return false;
+        }
+
+        const existingColor =
+          variant.color.name
+            .trim()
+            .toLowerCase();
+
+        return (
+          existingColor ===
+            normalizedColor &&
+          variant.size === size
+        );
+      },
+    );
+  }
+
+  // ====================================================
+  // Add Variant
+  // ====================================================
 
   function addVariant() {
     setProduct((prev) => ({
       ...prev,
 
       variants: [
-        ...prev.variants,
-
         {
           color: {
             name: "",
-            hex: "",
+            hex: "#000000",
           },
 
           size: "",
@@ -79,13 +165,20 @@ export function AddProductProvider({
 
           barcode: "",
         },
+        ...prev.variants,
       ],
     }));
   }
 
-  // =========================================
-  // Update a variant
-  // =========================================
+  // ====================================================
+  // Update Variant
+  //
+  // Used for:
+  //
+  // size
+  // stock
+  // barcode
+  // ====================================================
 
   function updateVariant(
     index,
@@ -97,8 +190,58 @@ export function AddProductProvider({
         ...prev.variants,
       ];
 
+      const currentVariant =
+        variants[index];
+
+      if (!currentVariant) {
+        return prev;
+      }
+
+      // ================================================
+      // Check duplicate when SIZE changes
+      // ================================================
+
+      if (field === "size") {
+        const duplicate =
+          isDuplicateVariant(
+            variants,
+            index,
+            currentVariant.color.name,
+            value,
+          );
+
+        if (duplicate) {
+          setVariantErrors(
+            (prevErrors) => ({
+              ...prevErrors,
+              [index]:
+                "This color and size combination already exists.",
+            }),
+          );
+
+          return prev;
+        }
+
+        // Remove previous error
+        setVariantErrors(
+          (prevErrors) => {
+            const errors = {
+              ...prevErrors,
+            };
+
+            delete errors[index];
+
+            return errors;
+          },
+        );
+      }
+
+      // ================================================
+      // Update variant
+      // ================================================
+
       variants[index] = {
-        ...variants[index],
+        ...currentVariant,
         [field]: value,
       };
 
@@ -109,9 +252,14 @@ export function AddProductProvider({
     });
   }
 
-  // =========================================
-  // Update a nested color field
-  // =========================================
+  // ====================================================
+  // Update Variant Color
+  //
+  // Used for:
+  //
+  // color.name
+  // color.hex
+  // ====================================================
 
   function updateVariantColor(
     index,
@@ -123,11 +271,61 @@ export function AddProductProvider({
         ...prev.variants,
       ];
 
+      const currentVariant =
+        variants[index];
+
+      if (!currentVariant) {
+        return prev;
+      }
+
+      // ================================================
+      // Check duplicate only when COLOR NAME changes
+      // ================================================
+
+      if (field === "name") {
+        const duplicate =
+          isDuplicateVariant(
+            variants,
+            index,
+            value,
+            currentVariant.size,
+          );
+
+        if (duplicate) {
+          setVariantErrors(
+            (prevErrors) => ({
+              ...prevErrors,
+              [index]:
+                "This color and size combination already exists.",
+            }),
+          );
+
+          return prev;
+        }
+
+        // Remove previous error
+        setVariantErrors(
+          (prevErrors) => {
+            const errors = {
+              ...prevErrors,
+            };
+
+            delete errors[index];
+
+            return errors;
+          },
+        );
+      }
+
+      // ================================================
+      // Update nested color object
+      // ================================================
+
       variants[index] = {
-        ...variants[index],
+        ...currentVariant,
 
         color: {
-          ...variants[index].color,
+          ...currentVariant.color,
 
           [field]: value,
         },
@@ -140,9 +338,9 @@ export function AddProductProvider({
     });
   }
 
-  // =========================================
-  // Remove a variant
-  // =========================================
+  // ====================================================
+  // Remove Variant
+  // ====================================================
 
   function removeVariant(index) {
     setProduct((prev) => ({
@@ -152,61 +350,157 @@ export function AddProductProvider({
         (_, i) => i !== index,
       ),
     }));
+
+    // ================================================
+    // Remove its error
+    // ================================================
+
+    setVariantErrors((prev) => {
+      const errors = {
+        ...prev,
+      };
+
+      delete errors[index];
+
+      // Re-index errors because variants shifted
+      const reindexedErrors = {};
+
+      Object.entries(errors).forEach(
+        ([key, value]) => {
+          const oldIndex = Number(key);
+
+          if (oldIndex > index) {
+            reindexedErrors[
+              oldIndex - 1
+            ] = value;
+          } else {
+            reindexedErrors[oldIndex] =
+              value;
+          }
+        },
+      );
+
+      return reindexedErrors;
+    });
   }
 
-  // =========================================
-  // Reset everything
-  // =========================================
+  // ====================================================
+  // Reset Product
+  // ====================================================
 
   function resetProduct() {
     setProduct({
-      title: "",
-      description: "",
-      category: "",
+      ...initialProduct,
+
       tags: [],
       images: [],
-      price: "",
-      discount: 0,
-      material: "",
-      featured: false,
-      isActive: true,
-
       variants: [],
     });
+
+    setVariantErrors({});
 
     setActiveTab("general");
   }
 
+  // ====================================================
+  // Open Modal
+  // ====================================================
+
+  function openModal() {
+    setIsModalOpen(true);
+  }
+
+  // ====================================================
+  // Close Modal
+  // ====================================================
+
+  function closeModal() {
+    setIsModalOpen(false);
+  }
+
+  // ====================================================
+  // Close Modal + Reset
+  //
+  // Useful after successful product creation
+  // ====================================================
+
+  function closeAndReset() {
+    resetProduct();
+
+    setIsModalOpen(false);
+  }
+
+  // ====================================================
+  // Context Value
+  // ====================================================
+
+  const value = {
+    // -----------------------------------------------
+    // Modal
+    // -----------------------------------------------
+
+    isModalOpen,
+    setIsModalOpen,
+
+    openModal,
+    closeModal,
+    closeAndReset,
+
+    // -----------------------------------------------
+    // Tabs
+    // -----------------------------------------------
+
+    activeTab,
+    setActiveTab,
+
+    // -----------------------------------------------
+    // Product
+    // -----------------------------------------------
+
+    product,
+    setProduct,
+
+    updateProductField,
+
+    // -----------------------------------------------
+    // Variants
+    // -----------------------------------------------
+
+    addVariant,
+
+    updateVariant,
+
+    updateVariantColor,
+
+    removeVariant,
+
+    // -----------------------------------------------
+    // Variant Errors
+    // -----------------------------------------------
+
+    variantErrors,
+
+    setVariantErrors,
+
+    // -----------------------------------------------
+    // Reset
+    // -----------------------------------------------
+
+    resetProduct,
+  };
+
   return (
     <AddProductContext.Provider
-      value={{
-        // Modal
-        isModalOpen,
-        setIsModalOpen,
-
-        // Tabs
-        activeTab,
-        setActiveTab,
-
-        // Product
-        product,
-        setProduct,
-        updateProductField,
-
-        // Variants
-        addVariant,
-        updateVariant,
-        updateVariantColor,
-        removeVariant,
-
-        // Reset
-        resetProduct,
-      }}
+      value={value}
     >
       {children}
     </AddProductContext.Provider>
   );
 }
+
+// ======================================================
+// useAddProduct Hook
+// ======================================================
 
 export function useAddProduct() {
   const context = useContext(
@@ -215,7 +509,7 @@ export function useAddProduct() {
 
   if (!context) {
     throw new Error(
-      "AddProduct was used out of context provider!",
+      "useAddProduct must be used inside AddProductProvider",
     );
   }
 

@@ -127,27 +127,41 @@ export const productSchema = z.object({
     "Maternity",
   ]),
 
-  tags: z.array(z.string()).default([]),
+  tags: z.preprocess(
+    (value) =>
+      typeof value === "string"
+        ? value
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : value,
+    z.array(z.string()).default([]),
+  ),
 
   images: z
-    .array(z.string())
+    .array(z.instanceof(File))
     .min(
       1,
       "At least one image is required",
     ),
 
-  price: z
+  price: z.coerce
     .number()
     .min(0, "Price cannot be negative"),
 
-  discount: z.number().min(0).max(100),
+  discount: z.coerce
+    .number()
+    .min(0)
+    .max(100),
 
   material: z.string().optional(),
 
-  featured: z.boolean().default(false),
+  // featured: z.boolean().default(false),
 
-  isActive: z.boolean().default(true),
-
+  isActive: z.preprocess(
+    (value) => value === "on",
+    z.boolean(),
+  ),
   variants: z
     .array(
       z.object({
@@ -167,9 +181,14 @@ export const productSchema = z.object({
             ),
         }),
 
-        size: z.string(),
+        size: z
+          .string()
+          .min(1, "Size is required"),
 
-        stock: z.number().int().min(0),
+        stock: z.coerce
+          .number()
+          .int()
+          .min(0),
 
         barcode: z.string().optional(),
       }),
